@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+from dotenv import dotenv_values
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -81,9 +86,9 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'PIXLR',
-        'USER': 'postgres',
-        'PASSWORD': '9844',
-        'HOST': 'localhost',
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASS'),
+        'HOST': os.environ.get('DB_HOST'),
         'PORT': '5432'
 
     }
