@@ -15,9 +15,10 @@ def register_request(request):
 		form = NewUserForm(request.POST)
 		if form.is_valid():
 			user = form.save()
-			login(request, user)
-			messages.success(request, "Registration successful." )
-			return redirect("main:homepage")
+			if user is not None:
+				login(request, user)
+				messages.success(request, "Registration successful." )
+				return redirect("/")
 		messages.error(request, "Unsuccessful registration. Invalid information.")
 	form = NewUserForm
 	return render (request=request, template_name="register.html", context={"register_form":form, "title":"Register"})
@@ -33,11 +34,10 @@ def login_request(request):
 			user = authenticate(username=username, password=password)
 			if user is not None:
 				login(request, user)
-				messages.info(request, f"You are now logged in as {username}.")
-				return redirect("/home")
+				return redirect("/")
 			else:
 				messages.error(request,"Invalid username or password.")
 		else:
-			messages.error(request,"Invalid username or password.")
+			messages.warning(request,"Please Try Again!")
 	form = AuthenticationForm()
 	return render(request=request, template_name="login.html", context={"login_form":form, "title":"Login"})
