@@ -16,16 +16,6 @@
 			<div class="container py-5">
 
 				<h1 class="text-center">Login</h1>
-				{% if messages %}
-					<div class="messages col-xs-6" style="list-style-type:none;">
-						{% for message in messages %}
-						<li{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
-							{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Note: {% endif %}
-							{{ message }}
-						</li>
-						{% endfor %}
-					</div>
-				{% endif %}
 
 				<form method="POST">
 					{% csrf_token %}

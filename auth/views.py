@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 
+from main.models import Directory
+
 @login_required(login_url='/auth/login/')
 def logout_request(request):
     logout(request)
@@ -17,10 +19,16 @@ def register_request(request):
 			user = form.save()
 			if user is not None:
 				login(request, user)
+				home_dir = Directory(user_id=request.user, directory_name='home')
+				try:
+					home_dir.save()
+				except:
+					messages.error(request, "There Has Been A Problem, Please Try Again.")
+					return redirect('/')
 				messages.success(request, "Registration successful." )
 				return redirect("/")
 		messages.error(request, "Unsuccessful registration. Invalid information.")
-	form = NewUserForm
+	form = NewUserForm()
 	return render (request=request, template_name="register.html", context={"register_form":form, "title":"Register"})
 
 
@@ -34,6 +42,7 @@ def login_request(request):
 			user = authenticate(username=username, password=password)
 			if user is not None:
 				login(request, user)
+				messages.success(request, "Login successful." )
 				return redirect("/")
 			else:
 				messages.error(request,"Invalid username or password.")
