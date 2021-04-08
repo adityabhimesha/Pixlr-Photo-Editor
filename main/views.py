@@ -40,11 +40,18 @@ def edit_view(request, dir):
     except Directory.DoesNotExist:
         image = None
 
+    if request.user.is_authenticated:
+        home_dir = Directory.objects.filter(user_id=request.user, directory_name="home")
+        home_dir = home_dir[0].pk
+    else:
+        home_dir = -1
+
     context = {
         "title" : "Edit Image",
         "image" : image,
+        "home_dir" : home_dir,
     }
-    return render(request, template_name="dashboard.html", context=context)
+    return render(request, template_name="edit.html", context=context)
 
 
 

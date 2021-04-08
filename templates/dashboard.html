@@ -16,6 +16,7 @@
         height:140px;
         padding:20px;
         font-size:20px;
+        margin:10px;
     }
     .delete{
         display:none;
@@ -36,8 +37,8 @@
 
 </style>
 <div class="mt-5">
-	<div class="row w-100" >
-			<div class="col-md-3">
+	<div class="row" >
+			<div class="col-md-3 mt-2">
 				<div class="d-flex flex-column justify-content-start align-items-center glass pb-4" style="height:80vh;">
                     <img class="img-responsive mb-4 mt-5" style="width:30%;" src="{% static 'img/lens2.png' %}" alt="LOGO">
 					<h1 class="text-center">📸</h1>
@@ -46,7 +47,7 @@
                     <h4 class="text-center" style="margin-top:50px;"><a href="{% url 'logout' %}" class="btn custom-btn"><span class="fas fa-sign-out-alt"></span> Logout</a></h4>
 				</div>
 			</div>
-			<div class="col-md-9">
+			<div class="col-md-9 mt-2">
 				
 				<div class="glass" style="min-height:80vh;">
                     <div class="row d-flex justify-content-center" style="padding:20px;" id="top">
@@ -64,13 +65,13 @@
 
                         {% for dir in dirs %}                           
                             {% if dir.is_directory %}
-                            <div id="{{dir.pk}}" ondblclick="navigate(event,'{% url 'dashboard' dir=dir.pk %}')" class="glass box">
+                            <div id="{{dir.pk}}" onclick="navigate(event,'{% url 'dashboard' dir=dir.pk %}')" class="glass box">
                                 <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;"></div>
                                 <span class="fas fa-folder"></span>
                                 <div id="name{{dir.pk}}">{{dir.directory_name | title}}</div>
                             </div>
                             {% else %}
-                            <div id="{{dir.pk}}" ondblclick="navigate(event,'{% url 'edit' dir=dir.pk %}')" class="glass box bg-primary text-white">
+                            <div id="{{dir.pk}}" onclick="navigate(event,'{% url 'edit' dir=dir.pk %}')" class="glass box bg-primary text-white">
                                 <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;color:tomato"></div>
                                 <span class=" fas fa-file"></span>
                                 <div id="name{{dir.pk}}">{{dir.directory_name | title}}</div>
@@ -94,7 +95,7 @@
                 <div style="font-size:25px;" id="close_upload" class=" modal_delete fas fa-times-circle" data-bs-dismiss="modal" aria-label="Close"></div>
             </div>
         <div class="modal-body">
-            <div class="form-group" id="form_upload">
+            <div class="form-group col-md-8" id="form_upload">
                 <label for="directory_name">Image Name*</label>
                 <input class="form-control" type="text" id="id_directory_name" name="directory_name" required>
                 <label class="mt-3" for="image_path">Choose File*</label>
