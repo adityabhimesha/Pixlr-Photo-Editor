@@ -5,9 +5,37 @@ from rest_framework import authentication, permissions
 from .forms import ImageForm
 from django.http import JsonResponse
 from django.contrib import messages
+import os
+
+class EditAPI(APIView):
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, dir, format=None):
+        if(request.POST.get('directory_name') == "home"):
+            return JsonResponse("Image Cannot Be Named As Home", safe=False)
+
+        try:
+            image = Directory.objects.get(pk=dir)
+            if(image.user_id_id != request.user.id):
+                return JsonResponse("You Don't Have Permissions to that Image File", safe=False) 
+        except Directory.DoesNotExist:
+            return JsonResponse("Image File Does Not Exist", safe=False)
+            
+        if image.is_directory == 1:
+            return JsonResponse("Image File Cannot Be A DIR", safe=False)
+
+        print(request.FILES)
+        print(request.POST)
+        form = ImageForm(request.POST, request.FILES, instance=image)
+        print(form) 
+        if (form.is_valid()):
+            form.save()
+        else:
+            return JsonResponse("File Is Not Valid", safe=False)
+        return JsonResponse("Image Updated Successfully", safe=False)
 
 
-# class DirAPI()
 
 class DirectoryAPI(APIView):
 
@@ -17,20 +45,38 @@ class DirectoryAPI(APIView):
     #Upload Images############
     def post(self, request ,dir, format=None):
 
+        if(request.POST.get('directory_name') == ""):
+            payload={
+                "info":"Image Name Cannot Be Empty",
+            }
+            return JsonResponse(payload, safe=False)
+
         if(request.POST.get('directory_name') == "home"):
-            return JsonResponse("Image Cannot Be Named As Home", safe=False)
+            payload={
+                "info":"Image Cannot Be Named As Home",
+            }
+            return JsonResponse(payload, safe=False)
 
         try:
             parent_dir = Directory.objects.get(pk=dir)
             if(parent_dir.user_id_id != request.user.id):
-                return JsonResponse("You Don't Have Permissions to that DIR", safe=False) 
+                payload={
+                    "info":"You Don't Have Permissions to that DIR",
+                }
+                return JsonResponse(payload, safe=False)
         except Directory.DoesNotExist:
             parent_dir = None
 
         if parent_dir is None:
-            return JsonResponse("Parent DIR Does Not Exist", safe=False)
+            payload={
+                "info":"Parent DIR Does Not Exist",
+            }
+            return JsonResponse(payload, safe=False)
         if parent_dir.is_directory == 0:
-            return JsonResponse("Parent DIR Cannot Be A File", safe=False)
+            payload={
+                "info":"Parent DIR Cannot Be A File",
+            }
+            return JsonResponse(payload, safe=False)
 
         form = ImageForm(request.POST, request.FILES)
 
@@ -42,35 +88,70 @@ class DirectoryAPI(APIView):
             form.save()
             payload = "1"
         else:
-            return JsonResponse("File Is Not Valid", safe=False)
-        return JsonResponse("Image Uploaded Successfully", safe=False)
+            payload={
+                "info":"File Is Not Valid",
+            }
+            return JsonResponse(payload, safe=False)
+        payload={
+                "info":"Image Uploaded Successfully",
+                "dir" : form.pk,
+                "directory_name" : form.directory_name,
+            }
+        return JsonResponse(payload, safe=False)
+
     
 
     #Create Folders#############
     def put(self, request, dir, format=None):
+
+        if(request.data['name'] == ""):
+            payload={
+                "info":"DIR Name Cannot Be Empty",
+            }
+            return JsonResponse(payload, safe=False)
  
         if(request.data['name'] == "home"):
-            return JsonResponse("Cannot Be Named As Home", safe=False)
+            payload={
+                "info":"DIR Cannot Be Named As Home",
+            }
+            return JsonResponse(payload, safe=False)
         try:
             parent_dir = Directory.objects.get(pk=dir)
             if(parent_dir.user_id_id != request.user.id):
-                return JsonResponse("You Don't Have Permissions to that DIR", safe=False) 
+                payload={
+                    "info":"You Don't Have Permissions to that DIR",
+                }
+                return JsonResponse(payload, safe=False)
         except Directory.DoesNotExist:
             parent_dir = None
 
         if parent_dir is None:
-            return JsonResponse("Parent DIR Does Not Exist", safe=False)
+            payload={
+                "info":"Parent DIR Does Not Exist",
+            }
+            return JsonResponse(payload, safe=False)
         if parent_dir.is_directory == 0:
-            return JsonResponse("Parent DIR Cannot Be A File", safe=False)
+            payload={
+                "info":"Parent DIR Cannot Be A File",
+            }
+            return JsonResponse(payload, safe=False)
     
         new_dir = Directory(user_id=request.user, directory_name=request.data['name'])
         try:
             new_dir.parent_directory = parent_dir
             new_dir.save()
         except:
-            return JsonResponse("There Was A Problem!", safe=False)
+            payload={
+                "info":"There Was A Problem!",
+            }
+            return JsonResponse(payload, safe=False)
 
-        return JsonResponse("Folder Created Sucessfully", safe=False)
+        payload={
+            "info":"Folder Created Sucessfully",
+            "dir" : new_dir.pk,
+            "directory_name" : new_dir.directory_name,
+        }
+        return JsonResponse(payload, safe=False)
             
 
     def delete(self, request, dir, format=None):

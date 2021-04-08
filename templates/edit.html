@@ -108,7 +108,7 @@
 
                     </div>
                     <div class="d-flex flex-row justify-content-around settings-box mt-4">
-                        <div class="btn btn-lg btn-success" style="font-size:15px;" onclick="create()"><span class="fas fa-check"></span> Save</div>
+                        <div class="btn btn-lg btn-success" style="font-size:15px;" onclick="upload_image()"><span class="fas fa-check"></span> Save</div>
                         <div class="btn btn-lg btn-danger" style="font-size:15px;" onclick="window.history.back()"><span class="fas fa-times"></span> Cancel</div>
                     </div>
 
@@ -272,6 +272,63 @@
 
     function getFileName(str) {
         return "download"
+    }
+
+
+    var upload_file_url = "/edit/api/{{home_dir.pk}}"
+    var token = '{{csrf_token}}';
+    var formData = new FormData()
+
+    const upload_image = () => {
+
+        formData.append("directory_name", "{{home_dir.directory_name}}")
+
+        var c = document.createElement("canvas");
+        var ctx = c.getContext("2d");
+        var results;
+        c.width = srcEl.naturalWidth;     // update canvas size to match image
+        c.height = srcEl.naturalHeight;
+        ctx.drawImage(srcEl, 0, 0);       // draw in image
+        c.toBlob(function(blob) {        // get content as JPEG blob
+            results = blob
+            console.log(results)
+        
+        var blob = new Blob([results], {type : 'image/png'});
+        var fileOfBlob = new File([blob], 'modified_image.png');
+        formData.append("image_path", fileOfBlob)
+        console.log(formData);
+
+        fetch(upload_file_url, { // Your POST endpoint
+          method: 'POST',
+          headers: {
+            "X-CSRFToken": token,
+            "Accept":'application/json',
+          },
+          body: formData // This is your file object
+        }).then(
+          response => response.json() // if the response is a JSON object
+        ).then(
+          (json) => {
+                message(json, "info")
+                $('#close_upload').trigger('click')
+                console.log(json)
+          }
+        ).catch(
+          error => console.log(error) // Handle the error response object
+        );
+        }, "image/png", 0.75);
+
+        
+      };
+
+      function message(msg, tag){
+        var node_html = `<li class="text-center alert alert-${tag}">
+            ${msg}
+            <span id='close' class="fas fa-times-circle" onclick='this.parentNode.parentNode.removeChild(this.parentNode)'></span>
+        </li>`
+
+        var id = document.getElementById('msg_arr')
+        id.innerHTML += node_html
     }
 </script>
 {% endblock %}

@@ -65,13 +65,13 @@
 
                         {% for dir in dirs %}                           
                             {% if dir.is_directory %}
-                            <div id="{{dir.pk}}" onclick="navigate(event,'{% url 'dashboard' dir=dir.pk %}')" class="glass box">
+                            <div id="{{dir.pk}}" ondblclick="navigate(event,'{% url 'dashboard' dir=dir.pk %}')" class="glass box">
                                 <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;"></div>
                                 <span class="fas fa-folder"></span>
                                 <div id="name{{dir.pk}}">{{dir.directory_name | title}}</div>
                             </div>
                             {% else %}
-                            <div id="{{dir.pk}}" onclick="navigate(event,'{% url 'edit' dir=dir.pk %}')" class="glass box bg-primary text-white">
+                            <div id="{{dir.pk}}" ondblclick="navigate(event,'{% url 'edit' dir=dir.pk %}')" class="glass box bg-primary text-white">
                                 <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;color:tomato"></div>
                                 <span class=" fas fa-file"></span>
                                 <div id="name{{dir.pk}}">{{dir.directory_name | title}}</div>
@@ -121,7 +121,7 @@
             </div>
         <div class="modal-body">
             <div class="form-group" id="form_upload">
-                <label for="directory_name">Folder Name*</label>
+                <label for="directory_name">Folder Name</label>
                 <input class="form-control" type="text" id="id_directory_name2" name="directory_name" required>
                 <div class="form-group mt-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -157,7 +157,10 @@
           response => response.json() // if the response is a JSON object
         ).then(
           (json) => {
-                message(json, "info")
+                message(json.info, "info")
+                if(json.info == 'Image Uploaded Successfully'){
+                  create_ui(json.dir, json.directory_name, false)
+                }
                 $('#close_upload').trigger('click')
                 console.log(json)
           }
@@ -167,7 +170,6 @@
       };
 
       const create_folder = () => {
-        
 
         fetch(upload_file_url, { // Your POST endpoint
           method: 'PUT',
@@ -181,7 +183,10 @@
           response => response.json() // if the response is a JSON object
         ).then(
           (json) => {
-            message(json, "info")
+            message(json.info, "info")
+            if(json.info == 'Folder Created Sucessfully'){
+              create_ui(json.dir, json.directory_name, true)
+            }
             $('#close_create').trigger('click')
             console.log(json)
           }
@@ -193,6 +198,7 @@
 
 
     function delete_node(node){
+        node.preventDefault()
         var parent_node = node.currentTarget.parentNode
         var str = "#name"+parent_node.id
         var confirm = window.confirm("Are You Sure You Want To Delete "+$(str).text()+"?")
@@ -209,6 +215,7 @@
               ).then(
                 (json) => {
                   message(json, "info")
+                  console.log("delete")
                   if(json = "Folder Deleted Successfully"){
                       parent_node.remove()
                       console.log("deleted node ",parent_node.id)
@@ -235,6 +242,30 @@
 
         var id = document.getElementById('msg_arr')
         id.innerHTML += node_html
+    }
+
+    function create_ui(dir, directory_name, is_directory){
+      var folder = `
+      <div id="${dir}" ondblclick="navigate(event,'/dashboard/${dir}')" class="glass box">
+        <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;"></div>
+        <span class="fas fa-folder"></span>
+        <div style="text-transform:capitalize;" id="name${dir}">${directory_name}</div>
+      </div>
+    `
+    var image = `
+    <div id="${dir}" ondblclick="navigate(event,'/edit/${dir}')" class="glass box bg-primary text-white">
+      <div onclick="delete_node(event)" class="delete fas fa-times-circle" style="margin-bottom:20px;color:tomato"></div>
+      <span class=" fas fa-file"></span>
+      <div style="text-transform:capitalize;" id="name${dir}">${directory_name}</div>
+    </div>
+    `
+
+    if(is_directory == true){
+      document.getElementById('main').innerHTML += folder
+    }
+    else{
+      document.getElementById('main').innerHTML += image
+    }
     }
 </script>
 
