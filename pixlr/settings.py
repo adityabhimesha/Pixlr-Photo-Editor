@@ -8,6 +8,12 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
+
+
+
+AWS  site http://ec2-52-55-1-196.compute-1.amazonaws.com:8000/
+
+
 """
 import os
 from pathlib import Path
@@ -16,6 +22,9 @@ from dotenv import load_dotenv
 from dotenv import dotenv_values
 
 load_dotenv()
+
+import django-heroku
+django_heroku.settings(locals())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,7 +95,7 @@ DATABASES = {
     'default': {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'PIXLR',
+        'NAME': os.environ.get('DB_NAME'),
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASS'),
         'HOST': os.environ.get('DB_HOST'),
