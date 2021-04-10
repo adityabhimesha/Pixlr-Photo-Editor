@@ -23,8 +23,6 @@ from dotenv import dotenv_values
 
 load_dotenv()
 
-import django-heroku
-django_heroku.settings(locals())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
