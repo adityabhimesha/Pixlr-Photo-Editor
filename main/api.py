@@ -137,7 +137,7 @@ class DirectoryAPI(APIView):
             return JsonResponse(payload, safe=False)
         existing_childs = Directory.objects.filter(parent_directory=parent_dir.pk)
         for child in existing_childs:
-            if(child.directory_name == request.data['name']):
+            if(child.directory_name == str(request.data['name']).lower()):
                 payload={
                     "info":"Cannot Have Duplicate Folder Names",
                 }
