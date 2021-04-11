@@ -135,6 +135,13 @@ class DirectoryAPI(APIView):
                 "info":"Parent DIR Cannot Be A File",
             }
             return JsonResponse(payload, safe=False)
+        existing_childs = Directory.objects.filter(parent_directory=parent_dir.pk)
+        for child in existing_childs:
+            if(child.directory_name == request.data['name']):
+                payload={
+                    "info":"Cannot Have Duplicate Folder Names",
+                }
+                return JsonResponse(payload, safe=False)
     
         new_dir = Directory(user_id=request.user, directory_name=request.data['name'])
         try:
