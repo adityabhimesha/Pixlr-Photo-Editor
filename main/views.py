@@ -19,10 +19,14 @@ def home(request):
 @login_required(login_url='/auth/login/')
 def dashboard_view(request, dir):
     
-    parent_dir = Directory.objects.get(pk=dir)
-    dirs = Directory.objects.filter(user_id_id=request.user, parent_directory=parent_dir)
-    if len(dirs) == 0:
-        dirs = None
+    try:
+        parent_dir = Directory.objects.get(pk=dir)
+        dirs = Directory.objects.filter(user_id_id=request.user, parent_directory=parent_dir)
+        if len(dirs) == 0:
+            dirs = None
+    except Directory.DoesNotExist:
+        messages.error(request, "Cannot Locate the DIR, Try Again!")
+        return redirect("/")
 
     if parent_dir.user_id != request.user:
         messages.error(request, "You Do Not Have Permissions To That DIR.")
