@@ -24,6 +24,10 @@ def dashboard_view(request, dir):
     if len(dirs) == 0:
         dirs = None
 
+    if parent_dir.user_id != request.user:
+        messages.error(request, "You Do Not Have Permissions To That DIR.")
+        return redirect("/")
+
     context = {
         "title" : "Dashboard",
         "home_dir" : parent_dir,
